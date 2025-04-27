@@ -27,3 +27,7 @@ dist/
 .vscode
 
 imgui.ini
+
+# Evaluation results and model checkpoints
+results_simple_eval/
+checkpoints/

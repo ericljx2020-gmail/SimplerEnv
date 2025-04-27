@@ -6,6 +6,8 @@ Example:
         --ckpt-path ./checkpoints/rt_1_tf_trained_for_000400120  --task google_robot_pick_coke_can  --logging-root ./results_simple_eval/  --n-trajs 10
     python simpler_env/simple_inference_visual_matching_prepackaged_envs.py --policy octo-small \
         --ckpt-path None --task widowx_spoon_on_towel  --logging-root ./results_simple_eval/  --n-trajs 10
+    python simpler_env/simple_inference_visual_matching_prepackaged_envs.py --policy pi0 \
+        --ckpt-path lerobot/pi0 --task google_robot_pick_coke_can  --logging-root ./results_simple_eval/  --n-trajs 10
 """
 
 import argparse
@@ -21,7 +23,7 @@ from simpler_env.utils.env.observation_utils import get_image_from_maniskill2_ob
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--policy", default="rt1", choices=["rt1", "octo-base", "octo-small"])
+parser.add_argument("--policy", default="rt1", choices=["rt1", "octo-base", "octo-small", "pi0"])
 parser.add_argument(
     "--ckpt-path",
     type=str,
@@ -75,6 +77,10 @@ elif "octo" in args.policy:
     from simpler_env.policies.octo.octo_model import OctoInference
 
     model = OctoInference(model_type=args.ckpt_path, policy_setup=policy_setup, init_rng=0)
+elif args.policy == "pi0":
+    from simpler_env.policies.pi0.pi0_model import Pi0Inference
+    
+    model = Pi0Inference(model_name=args.ckpt_path, policy_setup=policy_setup)
 else:
     raise NotImplementedError()
 
