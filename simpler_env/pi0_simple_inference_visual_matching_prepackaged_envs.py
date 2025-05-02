@@ -71,6 +71,8 @@ if args.policy in ["rt1"]:
 env = simpler_env.make(args.task)
 policy_setup = "google_robot" if "google_robot" in args.task else "widowx_bridge"
 
+env._max_episode_steps = 400
+
 if args.policy == "rt1":
     from simpler_env.policies.rt1.rt1_model import RT1Inference
     model = RT1Inference(saved_model_path=args.ckpt_path, policy_setup=policy_setup)
@@ -130,5 +132,5 @@ for ep_id in range(args.n_trajs):
     success_arr.append(success)
     print(f"Episode {ep_id} success: {success}")
     # media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.mp4", images, fps=5, codec="libx264", bps="2M")
-    media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.gif", images, fps=5, codec="gif")
+    media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.gif", images, fps=25, codec="gif")
 print("**Overall Success**", np.mean(success_arr), f"({np.sum(success_arr)}/{len(success_arr)})")
