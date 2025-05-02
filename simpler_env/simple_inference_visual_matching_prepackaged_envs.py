@@ -2,12 +2,9 @@
 Simple script for real-to-sim eval using the prepackaged visual matching setup in ManiSkill2.
 Example:
     cd {path_to_simpler_env_repo_root}
-    python simpler_env/simple_inference_visual_matching_prepackaged_envs.py --policy rt1 \
-        --ckpt-path ./checkpoints/rt_1_tf_trained_for_000400120  --task google_robot_pick_coke_can  --logging-root ./results_simple_eval/  --n-trajs 10
-    python simpler_env/simple_inference_visual_matching_prepackaged_envs.py --policy octo-small \
-        --ckpt-path None --task widowx_spoon_on_towel  --logging-root ./results_simple_eval/  --n-trajs 10
-    python simpler_env/simple_inference_visual_matching_prepackaged_envs.py --policy pi0 \
-        --ckpt-path lerobot/pi0 --task google_robot_pick_coke_can  --logging-root ./results_simple_eval/  --n-trajs 10
+    python simpler_env/pi0_simple_inference_visual_matching_prepackaged_envs.py --policy pi0 --ckpt-path lerobot/pi0 --task google_robot_pick_coke_can --n-trajs 1
+    python simpler_env/pi0_simple_inference_visual_matching_prepackaged_envs.py --policy pi0 --ckpt-path lerobot/pi0 --task widowx_spoon_on_towel --n-trajs 1
+
 """
 
 import argparse

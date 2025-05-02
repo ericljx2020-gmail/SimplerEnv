@@ -129,6 +129,6 @@ for ep_id in range(args.n_trajs):
 
     success_arr.append(success)
     print(f"Episode {ep_id} success: {success}")
-    media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.mp4", images, fps=5)
-
+    # media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.mp4", images, fps=5, codec="libx264", bps="2M")
+    media.write_video(f"{logging_dir}/episode_{ep_id}_success_{success}.gif", images, fps=5, codec="gif")
 print("**Overall Success**", np.mean(success_arr), f"({np.sum(success_arr)}/{len(success_arr)})")
