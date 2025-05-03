@@ -12,6 +12,8 @@ Example:
         --n-trajs 10
         
     python simpler_env/pi0_simple_inference_visual_matching_prepackaged_envs.py --policy pi0 --ckpt-path lerobot/pi0 --task widowx_carrot_on_plate --n-trajs 1
+    python simpler_env/pi0_simple_inference_visual_matching_prepackaged_envs.py --policy pi0 --ckpt-path /mnt/pentagon/rutu/lerobot/outputs/train/2025-04-29/11-48-55_pi0/checkpoints/last/pretrained_model --task widowx_carrot_on_plate --n-trajs 1
+
 """
 
 import argparse

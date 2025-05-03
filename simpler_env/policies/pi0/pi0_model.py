@@ -11,7 +11,8 @@ from huggingface_hub import hf_hub_download
 
 # --- LeRobot ----------------------------------------------------------------
 from lerobot.common.constants import OBS_ROBOT, ACTION
-from lerobot.common.policies.pi0.modeling_pi0 import PI0Policy, resize_with_pad
+# from lerobot.common.policies.pi0.modeling_pi0 import PI0Policy, resize_with_pad
+from lerobot.common.policies.pi0.modeling_pi0_finetuned import PI0Policy, resize_with_pad
 from lerobot.common.policies.pi0.configuration_pi0 import PI0Config
 from lerobot.configs.types import FeatureType, NormalizationMode, PolicyFeature
 
@@ -24,12 +25,12 @@ class CustomPI0Policy(PI0Policy):
         self.default_action_dim = 7   # Δx Δy Δz | axis‑angle(3) | gripper
 
     # --- simplified image path ----------------------------------------------
-    def prepare_images(self, batch: Dict[str, torch.Tensor]) -> Tuple[list, list]:
-        key = "image" if "image" in batch else "observation.image.top"
-        img = batch[key]                                  # (B,3,H,W) float32 [0,1]
-        img = resize_with_pad(img, 224, 224, pad_value=0) # (B,3,224,224)
-        img = img * 2.0 - 1.0                             # → [‑1,1]
-        return [img], [torch.ones(img.shape[0], dtype=torch.bool, device=img.device)]
+    # def prepare_images(self, batch: Dict[str, torch.Tensor]) -> Tuple[list, list]:
+    #     key = "image" if "image" in batch else "observation.image.top"
+    #     img = batch[key]                                  # (B,3,H,W) float32 [0,1]
+    #     img = resize_with_pad(img, 224, 224, pad_value=0) # (B,3,224,224)
+    #     img = img * 2.0 - 1.0                             # → [‑1,1]
+    #     return [img], [torch.ones(img.shape[0], dtype=torch.bool, device=img.device)]
 
     # --- en‑queue 50‑step autoregressive actions -----------------------------
     @torch.no_grad
@@ -37,11 +38,11 @@ class CustomPI0Policy(PI0Policy):
         batch = self.normalize_inputs(batch)
 
         if len(self._action_queue) == 0:
-            imgs, img_masks = self.prepare_images(batch)
+            imgs, img_masks, dav2_images, dav2_masks = self.prepare_images(batch)
             state = self.prepare_state(batch)
             tokens, token_masks = self.prepare_language(batch)
             acts = self.model.sample_actions(
-                imgs, img_masks, tokens, token_masks, state
+                imgs, img_masks, tokens, token_masks, state, dav2_images, dav2_masks
             )[:, :, : self.default_action_dim]            # (B,50,7)
             self._action_queue.extend(acts.transpose(0, 1))  # 50 × (B,7)
 
@@ -177,7 +178,7 @@ class Pi0Inference:
 
         
         batch = {
-            "image": img_t,
+            "observation.image.top": img_t,
             "observation.state": st_t,
             "task": [self.instruction or ""],
         }
