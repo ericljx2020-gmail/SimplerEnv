@@ -10,6 +10,8 @@ Example:
         --task google_robot_pick_coke_can \
         --logging-root ./results_simple_eval/ \
         --n-trajs 10
+        
+    python simpler_env/pi0_simple_inference_visual_matching_prepackaged_envs.py --policy pi0 --ckpt-path lerobot/pi0 --task widowx_carrot_on_plate --n-trajs 1
 """
 
 import argparse
