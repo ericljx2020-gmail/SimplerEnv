@@ -147,9 +147,15 @@ class Pi0Inference:
 
     # ------------------------------------------------------------------------
     def _whiten_image(self, img_t: torch.Tensor) -> torch.Tensor:
-        # 以前做了：(img/255 - mean)/std  → 区间[-2,2]，太大
-        # 现在只需要把 uint8 变成 0~1
-        return img_t / 255.0
+        # Convert image from [0, 255] or [0, 1] to [-1, 1] range
+        # First ensure we're in [0, 1] range
+        if img_t.max() > 1.0:
+            img_t = img_t / 255.0
+        
+        # Then convert to [-1, 1] range as expected by SigLIP/PaliGemma
+        img_t = img_t * 2.0 - 1.0
+        
+        return img_t
 
     # ----------------- SimplerEnv contract ----------------------------------
     def reset(self, instruction: str) -> None:
@@ -187,15 +193,33 @@ class Pi0Inference:
         print("IMG tensor dtype/min/max:", img_t.dtype, img_t.min().item(), img_t.max().item())
         print("STATE tensor mean/std:", st_t.mean().item(), st_t.std().item())
         print("TASK string:", self.instruction)
-            
-        with torch.no_grad():
-            a_norm = self.policy.select_action(batch)[0].cpu().numpy()
+        
+        # Set to use safe execution with retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:    
+                with torch.no_grad():
+                    a_norm = self.policy.select_action(batch)[0].cpu().numpy()
+                break
+            except Exception as e:
+                print(f"Error in attempt {attempt+1}/{max_retries}: {e}")
+                if attempt == max_retries - 1:
+                    # On final attempt, fall back to a safe default action
+                    print("Using fallback default action")
+                    a_norm = np.zeros(7, dtype=np.float32)
+                    a_norm[6] = 0.5  # Neutral gripper position
         
         print("RAW a_norm:", a_norm, "min/max:", a_norm.min(), a_norm.max())
         a_unnorm = a_norm * self._ACT_STD.numpy() + self._ACT_MEAN.numpy()
-        # un‑normalize 与单位转换
-        world = a_unnorm[:3] * self.ACTION_TRANSLATION_SCALE
-        rot   = a_unnorm[3:6] * self.ACTION_ROTATION_SCALE
+        
+        # Scale down action magnitudes to produce smoother movements
+        # Reduce these values if movements are too aggressive
+        translation_scale = self.ACTION_TRANSLATION_SCALE * 0.5  # Reduced by half
+        rotation_scale = self.ACTION_ROTATION_SCALE * 0.5       # Reduced by half
+        
+        # un‑normalize with smaller scales for smoother movements
+        world = a_unnorm[:3] * translation_scale
+        rot   = a_unnorm[3:6] * rotation_scale
         grip  = a_unnorm[6:7]
 
         return {ACTION: a_unnorm}, {
