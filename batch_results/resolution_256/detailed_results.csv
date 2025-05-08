@@ -1,0 +1,11 @@
+image,resolution,num_masks,time_seconds
+pi0_episode_2_success_False_0011.jpg,256,11,2.3271095752716064
+pi0_episode_7_success_False_0027.jpg,256,13,1.8481035232543945
+pi0_episode_5_success_False_0024.jpg,256,13,1.9280567169189453
+pi0_episode_2_success_False_0024.jpg,256,10,2.0219979286193848
+pretrained_model_episode_0_success_False_0006.jpg,256,11,2.0558364391326904
+pi0_episode_5_success_False_0022.jpg,256,10,1.9566562175750732
+pi0_episode_4_success_False_0026.jpg,256,9,2.0266952514648438
+pretrained_model_episode_3_success_False_0022.jpg,256,14,2.0780081748962402
+pi0_episode_6_success_False_0034.jpg,256,14,1.911773920059204
+pi0_episode_5_success_False_0028.jpg,256,12,1.9302806854248047
